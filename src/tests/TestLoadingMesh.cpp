@@ -1,6 +1,10 @@
+#include <memory>
+
 #include "TestLoadingMesh.h"
 #include "imgui/ImGui.h"
 
+unsigned int m_TexCoordVBO = 0;
+std::unique_ptr<Texture> m_Texture;
 
 namespace
 {
@@ -50,6 +54,7 @@ namespace test {
 
     TestLoadingMesh::TestLoadingMesh()
         : m_Shader("res/shaders/Mesh.shader"),
+        m_OutlineShader("res/shaders/SingleColor.shader"),
         m_ModelPosition(0.0f),
         m_ModelRotation(0.0f)
     {
@@ -60,7 +65,7 @@ namespace test {
         tg3_error_stack_init(&errors);
         tg3_parse_options_init(&options);
 
-        const char* path = "res/models/suzanne.glb";
+        const char* path = "res/models/world.glb";
 
         const tg3_error_code result = tg3_parse_file(
             &model,
@@ -110,32 +115,88 @@ namespace test {
         const tg3_buffer_view& indexView = model.buffer_views[indices.buffer_view];
         const tg3_buffer& indexBuffer = model.buffers[indexView.buffer];
 
+                // ---- TEXCOORD_0 ----
+        const int uvAccessorIndex = FindAttribute(primitive, "TEXCOORD_0");
+        if (uvAccessorIndex < 0)
+        {
+            tg3_model_free(&model);
+            tg3_error_stack_free(&errors);
+            throw std::runtime_error("Model has no TEXCOORD_0");
+        }
+
+        const tg3_accessor& uv = model.accessors[uvAccessorIndex];
+        const tg3_buffer_view& uvView = model.buffer_views[uv.buffer_view];
+        const tg3_buffer& uvBuffer = model.buffers[uvView.buffer];
+
+        if (uv.component_type != TG3_COMPONENT_TYPE_FLOAT || uv.type != TG3_TYPE_VEC2)
+        {
+            tg3_model_free(&model);
+            tg3_error_stack_free(&errors);
+            throw std::runtime_error("Expected FLOAT VEC2 TEXCOORD_0");
+        }
+
+        // ---- Base color texture (embedded in the .glb) ----
+        if (primitive.material >= 0)
+        {
+            const tg3_material& material = model.materials[primitive.material];
+            const int texIndex = material.pbr_metallic_roughness.base_color_texture.index;
+
+            if (texIndex >= 0)
+            {
+                const tg3_texture& tex = model.textures[texIndex];
+                if (tex.source >= 0)
+                {
+                    const tg3_image& image = model.images[tex.source];
+                    if (image.buffer_view >= 0)
+                    {
+                        const tg3_buffer_view& imgView = model.buffer_views[image.buffer_view];
+                        const tg3_buffer& imgBuffer = model.buffers[imgView.buffer];
+                        m_Texture = std::make_unique<Texture>(
+                            imgBuffer.data.data + imgView.byte_offset,
+                            static_cast<int>(imgView.byte_length));
+                    }
+                }
+            }
+        }
+
+        if (!m_Texture)
+        {
+            tg3_model_free(&model);
+            tg3_error_stack_free(&errors);
+            throw std::runtime_error("Model has no embedded base color texture");
+        }
+
+        // ---- GL buffers ----
         glGenVertexArrays(1, &m_MeshVAO);
         glBindVertexArray(m_MeshVAO);
 
         glGenBuffers(1, &m_PositionVBO);
         glBindBuffer(GL_ARRAY_BUFFER, m_PositionVBO);
-        glBufferData(
-            GL_ARRAY_BUFFER,
+        glBufferData(GL_ARRAY_BUFFER,
             static_cast<GLsizeiptr>(positionView.byte_length),
             positionBuffer.data.data + positionView.byte_offset,
             GL_STATIC_DRAW);
-
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(
-            0,
-            3,
-            GL_FLOAT,
-            GL_FALSE,
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
             tg3_accessor_byte_stride(&position, &positionView),
             reinterpret_cast<void*>(static_cast<uintptr_t>(position.byte_offset)));
 
+        glGenBuffers(1, &m_TexCoordVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_TexCoordVBO);
+        glBufferData(GL_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(uvView.byte_length),
+            uvBuffer.data.data + uvView.byte_offset,
+            GL_STATIC_DRAW);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+            tg3_accessor_byte_stride(&uv, &uvView),
+            reinterpret_cast<void*>(static_cast<uintptr_t>(uv.byte_offset)));
+
         glGenBuffers(1, &m_IndexEBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexEBO);
-        glBufferData(
-            GL_ELEMENT_ARRAY_BUFFER,
-            static_cast<GLsizeiptr>(indexView.byte_length),
-            indexBuffer.data.data + indexView.byte_offset,
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(indexView.byte_length - indices.byte_offset),
+            indexBuffer.data.data + indexView.byte_offset + indices.byte_offset,
             GL_STATIC_DRAW);
 
         m_IndexCount = static_cast<GLsizei>(indices.count);
@@ -163,6 +224,7 @@ namespace test {
         glDeleteBuffers(1, &m_IndexEBO);
         glDeleteBuffers(1, &m_PositionVBO);
         glDeleteVertexArrays(1, &m_MeshVAO);
+        glDeleteBuffers(1, &m_TexCoordVBO);
 	}
 
 	void TestLoadingMesh::OnUpdate(float deltaTime)
@@ -173,6 +235,11 @@ namespace test {
     void TestLoadingMesh::OnRender()
     {
         GLCall(glEnable(GL_DEPTH_TEST));
+        GLCall(glEnable(GL_STENCIL_TEST));
+        GLCall(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
 
         m_Model = glm::mat4(1.0f);
         m_Model = glm::translate(m_Model, m_ModelPosition);
@@ -183,23 +250,53 @@ namespace test {
 
         const glm::mat4 mvp = m_Proj * m_View * m_Model;
 
+
+        m_Texture->Bind(0);
         m_Shader.Bind();
         m_Shader.setUniformMat4f("u_MVP", mvp);
-        m_Shader.setUniform4f("u_Color", 0.85f, 0.65f, 0.2f, 1.0f);
+        m_Shader.setUniform1i("u_Texture", 0);
+        m_Shader.setUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
 
         glBindVertexArray(m_MeshVAO);
         glDrawElements(GL_TRIANGLES, m_IndexCount, m_IndexType, nullptr);
+		glBindVertexArray(0);
 
 
+        const float outlineScale = 1.02f; // ~5% bigger; expose in ImGui to tweak
+
+        glm::mat4 outlineModel = glm::mat4(1.0f);
+        outlineModel = glm::translate(outlineModel, m_ModelPosition);
+        outlineModel = glm::rotate(outlineModel, glm::radians(m_ModelRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+        outlineModel = glm::scale(outlineModel, glm::vec3(outlineScale)); // applied first to the vertices
+
+        const glm::mat4 outlineMVP = m_Proj * m_View * outlineModel;
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
         GLCall(glDisable(GL_DEPTH_TEST));
+
+		m_OutlineShader.Bind();
+		m_OutlineShader.setUniformMat4f("u_MVP", outlineMVP);
+        m_OutlineShader.setUniform1i("u_Texture", 0);
+        m_OutlineShader.setUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+
+        glBindVertexArray(m_MeshVAO);
+        glDrawElements(GL_TRIANGLES, m_IndexCount, m_IndexType, nullptr);
+        glBindVertexArray(0);
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glDisable(GL_STENCIL_TEST);
+        glEnable(GL_DEPTH_TEST);
+
     }
 
 	void TestLoadingMesh::OnImGuiRender()
 	{
 		{
-			ImGui::SliderFloat("X", &m_ModelPosition.x, 0.0f, 960.0f);
-			ImGui::SliderFloat("Y", &m_ModelPosition.y, 0.0f, 540.0f);
-			ImGui::SliderFloat("Z", &m_ModelPosition.z, -1000.0f, 1000.0f);
+			ImGui::SliderFloat("X", &m_ModelPosition.x, -1.0f, 1.0f);
+			ImGui::SliderFloat("Y", &m_ModelPosition.y, -1.0f, 1.0f);
+			ImGui::SliderFloat("Z", &m_ModelPosition.z, -1.0f, 1.0f);
 		}
 		{
 			ImGui::SliderFloat("Rotation", &m_ModelRotation, 0.0f, 360.0f);
@@ -207,10 +304,6 @@ namespace test {
 		}
 	
 	}
-
-
-
-
 
 }
 

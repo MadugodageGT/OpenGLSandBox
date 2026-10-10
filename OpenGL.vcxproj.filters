@@ -93,6 +93,12 @@
     <ClCompile Include="src\tests\TestLoadingMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\tests\TestParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tests\TestStencilAnnotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
@@ -521,6 +527,11 @@
     <None Include="res\shaders\IsoMetric.shader" />
     <None Include="res\models\cube.glb" />
     <None Include="res\shaders\Mesh.shader" />
+    <None Include="res\shaders\ParticleSystem.shader" />
+    <None Include="res\shaders\SingleColor.shader" />
+    <None Include="res\models\buster_drone.glb" />
+    <None Include="res\models\suzanne.glb" />
+    <None Include="res\models\world.glb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -1475,6 +1486,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tests\TestLoadingMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tests\TestParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tests\TestStencilAnnotation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

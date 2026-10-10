@@ -40,6 +40,7 @@ namespace test {
         GLenum m_IndexType = GL_UNSIGNED_INT;
 
         Shader m_Shader;
+		Shader m_OutlineShader;
 
         glm::mat4 m_Proj;
         glm::mat4 m_View;

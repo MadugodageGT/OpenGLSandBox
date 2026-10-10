@@ -10,8 +10,12 @@ private:
 	unsigned char* m_LocalBuffer;
 	int m_Width, m_Height, m_BPP;
 
+	void Upload(const unsigned char* pixels, GLenum wrap);
+
 public:
 	Texture(const std::string& path);
+
+	Texture(const unsigned char* encodedData, int size);
 	~Texture();
 
 	void Bind(unsigned int slot = 0) const;

@@ -150,7 +150,9 @@
     <ClCompile Include="src\tests\TestGoing3D.cpp" />
     <ClCompile Include="src\tests\TestIsometric.cpp" />
     <ClCompile Include="src\tests\TestLoadingMesh.cpp" />
+    <ClCompile Include="src\tests\TestParticleSystem.cpp" />
     <ClCompile Include="src\tests\TestQuadColor.cpp" />
+    <ClCompile Include="src\tests\TestStencilAnnotation.cpp" />
     <ClCompile Include="src\tests\TestTexture2D.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\vendors\glm\detail\glm.cpp" />
@@ -172,12 +174,17 @@
     <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\models\buster_drone.glb" />
     <None Include="res\models\cube.glb" />
+    <None Include="res\models\suzanne.glb" />
+    <None Include="res\models\world.glb" />
     <None Include="res\shaders\Basic.shader" />
     <None Include="res\shaders\BasicTexture.shader" />
     <None Include="res\shaders\BatchRendering.shader" />
     <None Include="res\shaders\IsoMetric.shader" />
     <None Include="res\shaders\Mesh.shader" />
+    <None Include="res\shaders\ParticleSystem.shader" />
+    <None Include="res\shaders\SingleColor.shader" />
     <None Include="src\vendors\glm\detail\func_common.inl" />
     <None Include="src\vendors\glm\detail\func_common_simd.inl" />
     <None Include="src\vendors\glm\detail\func_exponential.inl" />
@@ -321,6 +328,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\tests\isoUtils\IsoTileMap.h" />
@@ -328,9 +336,11 @@
     <ClInclude Include="src\tests\TestGoing3D.h" />
     <ClInclude Include="src\tests\TestIsometric.h" />
     <ClInclude Include="src\tests\TestLoadingMesh.h" />
+    <ClInclude Include="src\tests\TestParticleSystem.h" />
     <ClInclude Include="src\tests\TestQuadColor.h" />
     <ClInclude Include="src\tests\Test.h" />
     <ClInclude Include="src\tests\TestClearColor.h" />
+    <ClInclude Include="src\tests\TestStencilAnnotation.h" />
     <ClInclude Include="src\tests\TestTexture2D.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\vendors\glm\common.hpp" />

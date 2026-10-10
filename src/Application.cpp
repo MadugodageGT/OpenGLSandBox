@@ -30,6 +30,8 @@
 #include "tests/TestBatchRendering.h"
 #include "tests/TestIsoMetric.h"
 #include "tests/TestLoadingMesh.h"
+#include "tests/TestParticleSystem.h"
+#include "tests/TestStencilAnnotation.h"
 
 void KeyCallback(
     GLFWwindow* window,
@@ -38,6 +40,12 @@ void KeyCallback(
     int action,
     int mods
 );
+
+void MouseButtonCallback(
+    GLFWwindow* window,
+    int button,
+    int action,
+    int mods);
 
 int main(void)
 {
@@ -51,7 +59,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1024, 720, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1024, 720, "OpenGL SandBox", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -74,7 +82,7 @@ int main(void)
     ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(window, false);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
     test::Test* currentTest = nullptr;
@@ -83,14 +91,16 @@ int main(void)
 
     glfwSetWindowUserPointer(window, &currentTest);
     glfwSetKeyCallback(window, KeyCallback);
+	glfwSetMouseButtonCallback(window, MouseButtonCallback);
 
     //testMenu->RegisterTest<test::TestClearColor>("Clear Color");
     //testMenu->RegisterTest<test::TestQuadColor>("Quad Color");
-    //testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
     //testMenu->RegisterTest<test::TestGoing3D>("Going 3D");
-    testMenu->RegisterTest<test::TestBatchRendering>("Batch Rendering");
-    testMenu->RegisterTest<test::TestIsoMetric>("IsoMetric");
+    //testMenu->RegisterTest<test::TestBatchRendering>("Batch Rendering");
+    //testMenu->RegisterTest<test::TestIsoMetric>("IsoMetric");
     testMenu->RegisterTest<test::TestLoadingMesh>("Loadin Mesh");
+    testMenu->RegisterTest<test::TestStencilAnnotation>("Stencil Annotation");
+	//testMenu->RegisterTest<test::TestParticleSystem>("Particle System");
 
 
     while (!glfwWindowShouldClose(window))
@@ -151,5 +161,33 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if (*currentTest)
     {
         (*currentTest)->OnEvent(key, action);
+    }
+}
+
+
+void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse)
+        return;
+
+    test::Test** currentTest =
+        static_cast<test::Test**>(glfwGetWindowUserPointer(window));
+
+
+    if (*currentTest)
+    {
+        double mouseX, mouseY;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+
+        (*currentTest)->OnMouseButtonEvent(
+            button,
+            action,
+            mouseX,
+            mouseY
+        );
     }
 }

@@ -21,6 +21,8 @@ namespace test {
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(int key, int action) {}
 
+		virtual void OnMouseButtonEvent(int button, int action,double mouseX,double mouseY) {}
+
 	};
 
 	class TestMenu : public Test
