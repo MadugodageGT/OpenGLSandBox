@@ -139,6 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\annotation\AnnotationSystem.cpp" />
+    <ClCompile Include="src\annotation\Camera.cpp" />
+    <ClCompile Include="src\annotation\ClippingVolume.cpp" />
+    <ClCompile Include="src\annotation\DepthLayers.cpp" />
+    <ClCompile Include="src\annotation\SurfaceMesh.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -147,6 +152,7 @@
     <ClCompile Include="src\tests\Test.cpp" />
     <ClCompile Include="src\tests\TestBtachRendering.cpp" />
     <ClCompile Include="src\tests\TestClearColor.cpp" />
+    <ClCompile Include="src\tests\TestClippingVolume.cpp" />
     <ClCompile Include="src\tests\TestGoing3D.cpp" />
     <ClCompile Include="src\tests\TestIsometric.cpp" />
     <ClCompile Include="src\tests\TestLoadingMesh.cpp" />
@@ -174,13 +180,18 @@
     <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\models\24_12_2024.glb" />
     <None Include="res\models\buster_drone.glb" />
     <None Include="res\models\cube.glb" />
     <None Include="res\models\suzanne.glb" />
+    <None Include="res\models\thinTube.glb" />
     <None Include="res\models\world.glb" />
     <None Include="res\shaders\Basic.shader" />
     <None Include="res\shaders\BasicTexture.shader" />
     <None Include="res\shaders\BatchRendering.shader" />
+    <None Include="res\shaders\ClipDepth.shader" />
+    <None Include="res\shaders\ClipFlat.shader" />
+    <None Include="res\shaders\ClipMesh.shader" />
     <None Include="res\shaders\IsoMetric.shader" />
     <None Include="res\shaders\Mesh.shader" />
     <None Include="res\shaders\ParticleSystem.shader" />
@@ -327,12 +338,19 @@
     <None Include="src\vendors\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\annotation\AnnotationSystem.h" />
+    <ClInclude Include="src\annotation\Camera.h" />
+    <ClInclude Include="src\annotation\ClippingVolume.h" />
+    <ClInclude Include="src\annotation\DepthLayers.h" />
+    <ClInclude Include="src\annotation\GLStateGuard.h" />
+    <ClInclude Include="src\annotation\SurfaceMesh.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\tests\isoUtils\IsoTileMap.h" />
     <ClInclude Include="src\tests\TestBatchRendering.h" />
+    <ClInclude Include="src\tests\TestClippingVolume.h" />
     <ClInclude Include="src\tests\TestGoing3D.h" />
     <ClInclude Include="src\tests\TestIsometric.h" />
     <ClInclude Include="src\tests\TestLoadingMesh.h" />

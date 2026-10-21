@@ -99,6 +99,24 @@
     <ClCompile Include="src\tests\TestStencilAnnotation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\annotation\AnnotationSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\annotation\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\annotation\ClippingVolume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\annotation\DepthLayers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\annotation\SurfaceMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tests\TestClippingVolume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
@@ -532,6 +550,11 @@
     <None Include="res\models\buster_drone.glb" />
     <None Include="res\models\suzanne.glb" />
     <None Include="res\models\world.glb" />
+    <None Include="res\shaders\ClipDepth.shader" />
+    <None Include="res\shaders\ClipFlat.shader" />
+    <None Include="res\shaders\ClipMesh.shader" />
+    <None Include="res\models\thinTube.glb" />
+    <None Include="res\models\24_12_2024.glb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -1495,6 +1518,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\tests\TestStencilAnnotation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\annotation\AnnotationSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\annotation\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\annotation\ClippingVolume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\annotation\DepthLayers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\annotation\GLStateGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\annotation\SurfaceMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tests\TestClippingVolume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
